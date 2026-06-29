@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Address Book</title>
+<style>
+  :root {
+    --ink: #1f2724;
+    --paper: #f6f3ec;
+    --card: #ffffff;
+    --line: #d9d2c2;
+    --moss: #4a6b58;
+    --moss-dark: #36503f;
+    --rust: #b5582f;
+    --muted: #7c7568;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 32px 24px 20px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: 0.5px;
+  }
+
+  header .tally {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 28px;
+  }
+
+  @media (max-width: 720px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  section.panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+  .panel h2 {
+    margin: 0 0 14px;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--moss-dark);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+  }
+
+  label {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 14px 0 4px;
+  }
+
+  label:first-of-type { margin-top: 0; }
+
+  input, textarea {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  input:focus, textarea:focus, button:focus {
+    outline: 2px solid var(--moss);
+    outline-offset: 1px;
+  }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary {
+    background: var(--moss-dark);
+    color: #fff;
+    padding: 11px 18px;
+    width: 100%;
+    margin-top: 18px;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { background: var(--moss); }
+
+  .form-error {
+    margin-top: 10px;
+    color: var(--rust);
+    font-size: 0.82rem;
+    font-family: 'Courier New', monospace;
+    display: none;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .search-row input { flex: 1; }
+  .search-row button {
+    background: var(--ink);
+    color: #fff;
+    padding: 9px 14px;
+  }
+  .search-row button.clear {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  #contactList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .contact-card {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--moss);
+    border-radius: 3px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .contact-info .name {
+    font-size: 1.05rem;
+    font-weight: bold;
+  }
+  .contact-info .meta {
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .contact-info .desc {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: var(--ink);
+  }
+  .contact-info .id-tag {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .delete-btn {
+    background: transparent;
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .delete-btn:hover { background: var(--rust); color: #fff; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 10px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Address Book</h1>
+  <span class="tally" id="tally">0 contacts</span>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Add Contact</h2>
+    <form id="contactForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Jane Doe" required>
+
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" placeholder="012-345 6789" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="jane@example.com" required>
+
+      <label for="street">Street</label>
+      <input type="text" id="street" placeholder="12 Jalan Damai">
+
+      <div class="row2">
+        <div>
+          <label for="state">State</label>
+          <input type="text" id="state" placeholder="Selangor">
+        </div>
+        <div>
+          <label for="postcode">Postcode</label>
+          <input type="text" id="postcode" placeholder="47301">
+        </div>
+      </div>
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="Notes about this contact (optional)"></textarea>
+
+      <div class="form-error" id="formError"></div>
+      <button type="submit" class="btn-primary">Add Contact</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Contacts</h2>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Search by name...">
+      <button id="clearSearch" class="clear">Clear</button>
+    </div>
+    <div id="contactList"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
